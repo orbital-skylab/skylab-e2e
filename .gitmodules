@@ -1,0 +1,6 @@
+[submodule "skylab-frontend"]
+	path = skylab-frontend
+	url = https://github.com/orbital-skylab/skylab-frontend.git
+[submodule "skylab-backend"]
+	path = skylab-backend
+	url = https://github.com/orbital-skylab/skylab-backend.git

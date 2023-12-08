@@ -1,0 +1,61 @@
+name: e2e
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    e2e:
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:14
+                env:
+                    POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+                    POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+                    POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                  submodules: recursive
+
+            - name: Create env files
+              run: |
+                  echo "NEXT_PUBLIC_BASE_DEV_API_URL=http://backend:4000/api" > ./skylab-frontend/.env.local
+                  echo "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:5432/${{ secrets.POSTGRES_DB}}" > ./skylab-backend/.env
+                  echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> ./skylab-backend/.env
+                  echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> ./skylab-backend/.env
+                  echo "SALT_ROUNDS=${{ secrets.SALT_ROUNDS }}" >> ./skylab-backend/.env
+
+            - name: Set Up Database
+              run: npx prisma migrate deploy && npx prisma db seed
+              working-directory: ./skylab-backend
+
+            - name: Start Backend
+              run: npm run build && npm run start
+              working-directory: ./skylab-backend
+
+            - name: Start Frontend
+              run: npm run build && npm run start
+              working-directory: ./skylab-frontend
+
+            - name: Run E2E Tests
+              uses: cypress-io/github-action@v6
+              with:
+                  working-directory: ./skylab-frontend
+
+            - name: Download coverage report
+              uses: actions/download-artifact@v3
+              with:
+                  name: coverage

@@ -30,6 +30,11 @@ jobs:
               with:
                   submodules: recursive
 
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "16.13.2"
+
             - name: Create env files
               run: |
                   echo "NEXT_PUBLIC_BASE_DEV_API_URL=http://backend:4000/api" > ./skylab-frontend/.env.local

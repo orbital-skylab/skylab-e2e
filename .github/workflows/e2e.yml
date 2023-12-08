@@ -33,7 +33,7 @@ jobs:
             - name: Create env files
               run: |
                   echo "NEXT_PUBLIC_BASE_DEV_API_URL=http://backend:4000/api" > ./skylab-frontend/.env.local
-                  echo "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:5432/${{ secrets.POSTGRES_DB}}" > ./skylab-backend/.env
+                  echo "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB}}" > ./skylab-backend/.env
                   echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> ./skylab-backend/.env
                   echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> ./skylab-backend/.env
                   echo "SALT_ROUNDS=${{ secrets.SALT_ROUNDS }}" >> ./skylab-backend/.env
